@@ -111,6 +111,28 @@ namespace DesafioBackend.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("api/AtualizaStatus")]
+        public async Task<ActionResult<ClienteModel>> ChangeStatus(int id, bool status)
+        {
+            try
+            {
+                var cliente = await _context.Clientes.FindAsync(id);
+
+                cliente.Ativo = status;
+
+                _context.Clientes.Update(cliente);
+                await _context.SaveChangesAsync();
+
+                return Ok(await Get(cliente.Id));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
+
         [HttpDelete]
         public async Task<ActionResult<ClienteModel>> Delete(int id)
         {
