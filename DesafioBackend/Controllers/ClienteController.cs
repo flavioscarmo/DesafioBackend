@@ -63,18 +63,31 @@ namespace DesafioBackend.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ClienteModel>> Update(int id, ClienteModel cliente)
+        [HttpPut]
+        public async Task<ActionResult<ClienteModel>> Update(ClienteModel cliente)
         {
 
-            var ClienteUp = await _context.Clientes.FindAsync(id);
+            var clienteUp = await _context.Clientes.FindAsync(cliente.Id);
 
-            if (ClienteUp != null)
+            if (clienteUp == null)
             {
                 return NotFound(cliente);
             }
 
-            return BadRequest(cliente);
+            clienteUp.Ativo = cliente.Ativo;
+            clienteUp.Nome = cliente.Nome; 
+            clienteUp.Cnpj = cliente.Cnpj;
+            clienteUp.Planta = cliente.Planta;
+            clienteUp.PessoaResponsavel = cliente.PessoaResponsavel;
+            clienteUp.Email = cliente.Email;
+            clienteUp.TipoDeCliente = cliente.TipoDeCliente;
+            clienteUp.Ddd = cliente.Ddd;
+            clienteUp.Telefone = cliente.Telefone;
+
+            _context.Clientes.Update(clienteUp);
+            await _context.SaveChangesAsync();
+
+            return Ok(await Get(clienteUp.Id));
         }
     }
 }
