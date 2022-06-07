@@ -1,7 +1,9 @@
-﻿using DesafioBackend.Model;
+﻿using DesafioBackend.Data;
+using DesafioBackend.Model;
 using DesafioBackend.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.Entity;
 
 namespace DesafioBackend.Controllers
 {
@@ -9,19 +11,23 @@ namespace DesafioBackend.Controllers
     [ApiController]
     public class ClienteController : ControllerBase
     {
-        private readonly ClienteService _cliente;
+        private readonly DataContext _context;
 
-        public ClienteController(ClienteService cliente)
+        public ClienteController(DataContext context)
         {
-            _cliente = cliente;
+            _context = context;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAsync()
+        public async Task<ActionResult<List<ClienteModel>>> Get(int id)
         {
             try
             {
-                return Ok(await _cliente.GetAllAsync());
+                var cliente = await _context.Clientes
+                    .Where(x => x.Id == id)
+                    .ToListAsync();
+
+                return Ok(cliente);
             }
             catch (Exception ex)
             {
@@ -30,26 +36,28 @@ namespace DesafioBackend.Controllers
 
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(string id)
-        {
-            try
-            {
-                return Ok(await _cliente.GetAsync(id));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-
-        // POST api/values
         [HttpPost]
-        public async Task<IActionResult> Post(ClienteModel model)
+        public async Task<ActionResult<List<ClienteModel>>> Create(ClienteModel cliente)
         {
             try
             {
-                return Ok(await _cliente.PostAsync(model));
+                var newCliente = new ClienteModel
+                {
+                    Ativo = cliente.Ativo,
+                    Nome = cliente.Nome,
+                    Cnpj = cliente.Cnpj,
+                    Planta = cliente.Planta,
+                    PessoaResponsavel = cliente.PessoaResponsavel,
+                    Email = cliente.Email,
+                    Ddd = cliente.Ddd,
+                    Telefone = cliente.Telefone,
+                    TipoDeCliente = cliente.TipoDeCliente,
+                };
+
+                _context.Clientes.Add(newCliente);
+                await _context.SaveChangesAsync();
+
+                return Ok(await Get(newCliente.Id));
             }
             catch (Exception ex)
             {
@@ -57,30 +65,5 @@ namespace DesafioBackend.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(ClienteModel model)
-        {
-            try
-            {
-                return Ok(await _cliente.PutAsync(model));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            try
-            {
-                return Ok(await _cliente.DeleteAsync(id));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
     }
 }
