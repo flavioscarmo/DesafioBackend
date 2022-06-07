@@ -18,6 +18,21 @@ namespace DesafioBackend.Controllers
             _context = context;
         }
 
+
+        [HttpGet]
+        [Route("api/GetAll")]
+        public async Task<ActionResult<List<ClienteModel>>> Get()
+        {
+            try
+            {
+                return Ok(_context.Clientes);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+        }
         [HttpGet]
         public async Task<ActionResult<List<ClienteModel>>> Get(int id)
         {
@@ -66,28 +81,56 @@ namespace DesafioBackend.Controllers
         [HttpPut]
         public async Task<ActionResult<ClienteModel>> Update(ClienteModel cliente)
         {
-
-            var clienteUp = await _context.Clientes.FindAsync(cliente.Id);
-
-            if (clienteUp == null)
+            try
             {
-                return NotFound(cliente);
+                var clienteUp = await _context.Clientes.FindAsync(cliente.Id);
+
+                if (clienteUp == null)
+                {
+                    return NotFound(cliente);
+                }
+
+                clienteUp.Ativo = cliente.Ativo;
+                clienteUp.Nome = cliente.Nome;
+                clienteUp.Cnpj = cliente.Cnpj;
+                clienteUp.Planta = cliente.Planta;
+                clienteUp.PessoaResponsavel = cliente.PessoaResponsavel;
+                clienteUp.Email = cliente.Email;
+                clienteUp.TipoDeCliente = cliente.TipoDeCliente;
+                clienteUp.Ddd = cliente.Ddd;
+                clienteUp.Telefone = cliente.Telefone;
+
+                _context.Clientes.Update(clienteUp);
+                await _context.SaveChangesAsync();
+
+                return Ok(await Get(clienteUp.Id));
             }
-
-            clienteUp.Ativo = cliente.Ativo;
-            clienteUp.Nome = cliente.Nome; 
-            clienteUp.Cnpj = cliente.Cnpj;
-            clienteUp.Planta = cliente.Planta;
-            clienteUp.PessoaResponsavel = cliente.PessoaResponsavel;
-            clienteUp.Email = cliente.Email;
-            clienteUp.TipoDeCliente = cliente.TipoDeCliente;
-            clienteUp.Ddd = cliente.Ddd;
-            clienteUp.Telefone = cliente.Telefone;
-
-            _context.Clientes.Update(clienteUp);
-            await _context.SaveChangesAsync();
-
-            return Ok(await Get(clienteUp.Id));
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
+
+        [HttpDelete]
+        public async Task<ActionResult<ClienteModel>> Delete(int id)
+        {
+            try
+            {
+                var clienteDelete = await _context.Clientes.FindAsync(id);
+
+                if (clienteDelete == null)
+                    return NotFound(clienteDelete);
+
+                _context.Clientes.Remove(clienteDelete);
+                await _context.SaveChangesAsync();
+
+                return Ok("Deletado");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
     }
 }
