@@ -2,6 +2,7 @@
 {
     public class ClienteDTO
     {
+        public int Id { get; set; }
         public bool Ativo { get; set; }
         public string Nome { get; set; } = string.Empty;
         public string Cnpj { get; set; } = string.Empty;

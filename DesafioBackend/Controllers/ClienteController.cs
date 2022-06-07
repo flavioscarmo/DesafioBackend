@@ -23,9 +23,7 @@ namespace DesafioBackend.Controllers
         {
             try
             {
-                var cliente = await _context.Clientes
-                    .Where(x => x.Id == id)
-                    .ToListAsync();
+                var cliente = await _context.Clientes.FindAsync(id);
 
                 return Ok(cliente);
             }
@@ -65,5 +63,18 @@ namespace DesafioBackend.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<ActionResult<ClienteModel>> Update(int id, ClienteModel cliente)
+        {
+
+            var ClienteUp = await _context.Clientes.FindAsync(id);
+
+            if (ClienteUp != null)
+            {
+                return NotFound(cliente);
+            }
+
+            return BadRequest(cliente);
+        }
     }
 }

@@ -15,9 +15,5 @@ namespace DesafioBackend.Data
         public DbSet<TipoMaterialModel> TipoMaterial { get; set; }
         public DbSet<DddModel> Ddd { get; set; }
 
-        internal Task<object?> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
