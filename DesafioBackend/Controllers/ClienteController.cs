@@ -10,7 +10,12 @@ namespace DesafioBackend.Controllers
     public class ClienteController : ControllerBase
     {
         private readonly ClienteService _cliente;
-        
+
+        public ClienteController(ClienteService cliente)
+        {
+            _cliente = cliente;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
